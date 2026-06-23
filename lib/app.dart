@@ -1,19 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'config/routes/app_routes.dart';
 import 'config/routes/route_generator.dart';
+import 'config/di/injection_container.dart';
+import 'core/constants/app_constants.dart';
 import 'core/theme/app_theme.dart';
+import 'features/auth/presentation/bloc/auth_bloc.dart';
+import 'features/auth/presentation/bloc/auth_event.dart';
+import 'features/profile/presentation/bloc/profile_bloc.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Demo',
-      theme: AppTheme.light,
-      initialRoute: AppRoutes.splash,
-      debugShowCheckedModeBanner: false,
-      onGenerateRoute: RouteGenerator.generate,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthBloc>(create: (_) => injector<AuthBloc>()..add(const AuthSessionRestoreRequested())),
+        BlocProvider<ProfileBloc>(create: (_) => injector<ProfileBloc>()),
+      ],
+      child: MaterialApp(
+        title: AppConstants.appName,
+        theme: AppTheme.light,
+        initialRoute: AppRoutes.splash,
+        debugShowCheckedModeBanner: false,
+        onGenerateRoute: RouteGenerator.generate,
+      ),
     );
   }
 }
