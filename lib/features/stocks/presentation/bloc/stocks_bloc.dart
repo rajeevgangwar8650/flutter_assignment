@@ -55,9 +55,7 @@ class StocksBloc extends Bloc<StocksEvent, StocksState> {
         final indicesBySymbol = {
           for (final index in dashboard.indices) index.ss: index,
         };
-        final displaySymbols = dashboard.indices
-            .map((index) => index.ss)
-            .toList();
+        final displaySymbols = dashboard.indices.map((index) => index.ss).toList();
 
         emit(
           state.copyWith(

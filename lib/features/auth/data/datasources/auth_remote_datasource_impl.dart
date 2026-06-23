@@ -9,7 +9,6 @@ abstract class AuthRemoteDataSource {
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final ApiClient apiClient;
-
   const AuthRemoteDataSourceImpl(this.apiClient);
 
   @override

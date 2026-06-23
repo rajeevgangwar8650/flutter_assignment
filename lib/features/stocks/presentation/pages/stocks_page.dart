@@ -133,7 +133,7 @@ class _MarketHeader extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    '$stocks companies from the assignment dataset',
+                    '$stocks companies from the dataset',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: colorScheme.onPrimaryContainer,
                     ),

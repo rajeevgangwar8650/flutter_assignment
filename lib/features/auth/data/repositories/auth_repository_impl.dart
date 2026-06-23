@@ -17,10 +17,7 @@ class AuthRepositoryImpl implements AuthRepository {
   });
 
   @override
-  Future<Either<Failure, UserEntity>> signIn({
-    required String email,
-    required String password,
-  }) async {
+  Future<Either<Failure, UserEntity>> signIn({required String email, required String password}) async {
     try {
       final user = await remoteDataSource.signIn(
         email: email,

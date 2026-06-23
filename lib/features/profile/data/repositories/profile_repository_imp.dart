@@ -22,9 +22,7 @@ class ProfileRepositoryImpl implements ProfileRepository {
   }
 
   @override
-  Future<Either<Failure, ProfileEntity>> updateProfile(
-    ProfileEntity profile,
-  ) async {
+  Future<Either<Failure, ProfileEntity>> updateProfile(ProfileEntity profile) async {
     try {
       final savedProfile = await localDataSource.saveProfile(
         ProfileModel.fromEntity(profile),

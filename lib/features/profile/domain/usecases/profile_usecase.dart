@@ -17,8 +17,7 @@ class GetProfileUseCase implements UseCase<ProfileEntity, NoParams> {
   }
 }
 
-class UpdateProfileUseCase
-    implements UseCase<ProfileEntity, UpdateProfileParams> {
+class UpdateProfileUseCase implements UseCase<ProfileEntity, UpdateProfileParams> {
   final ProfileRepository repository;
 
   const UpdateProfileUseCase(this.repository);

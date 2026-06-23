@@ -2,8 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../core/constants/api_constants.dart';
 import '../../core/network/dio_client.dart';
 import '../../core/network/dio_interceptor.dart';
 import '../../core/network/network_info.dart';
@@ -39,100 +37,60 @@ Future<void> initDependencies() async {
   injector
     ..registerLazySingleton<SharedPreferences>(() => sharedPreferences)
     ..registerLazySingleton<LoggerService>(LoggerService.new)
-    ..registerLazySingleton<SharedPreferencesService>(
-      () => SharedPreferencesService(injector()),
-    )
-    ..registerLazySingleton<InternetConnectionChecker>(
-      () => InternetConnectionChecker.instance,
-    )
+    ..registerLazySingleton<SharedPreferencesService>(() => SharedPreferencesService(injector()))
+    ..registerLazySingleton<InternetConnectionChecker>(() => InternetConnectionChecker.instance)
     ..registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(injector()))
-    ..registerLazySingleton<AppLoggingInterceptor>(
-      () => AppLoggingInterceptor(logger: injector()),
-    )
+    ..registerLazySingleton<AppLoggingInterceptor>(() => AppLoggingInterceptor(logger: injector()))
     ..registerLazySingleton<AppErrorInterceptor>(AppErrorInterceptor.new)
-    ..registerLazySingleton<Dio>(() {
-      final dio = Dio(
-        BaseOptions(
-          baseUrl: ApiConstants.baseUrl,
-          connectTimeout: const Duration(seconds: 20),
-          receiveTimeout: const Duration(seconds: 20),
-          headers: const <String, dynamic>{
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          },
-        ),
-      );
-      dio.interceptors.addAll([
-        injector<AppLoggingInterceptor>(),
-        injector<AppErrorInterceptor>(),
-      ]);
-      return dio;
-    })
+
+    ..registerLazySingleton<Dio>(() => ApiClient.createDio(
+        loggingInterceptor: injector(),
+        errorInterceptor: injector(),
+      ),
+    )
     ..registerLazySingleton<ApiClient>(() => ApiClient(injector()))
-    // Auth
-    ..registerLazySingleton<AuthRemoteDataSource>(
-      () => AuthRemoteDataSourceImpl(injector()),
-    )
-    ..registerLazySingleton<AuthLocalDataSource>(
-      () => AuthLocalDataSourceImpl(injector()),
-    )
-    ..registerLazySingleton<AuthRepository>(
-      () => AuthRepositoryImpl(
+
+  // Auth
+    ..registerLazySingleton<AuthRemoteDataSource>(() => AuthRemoteDataSourceImpl(injector()))
+    ..registerLazySingleton<AuthLocalDataSource>(() => AuthLocalDataSourceImpl(injector()))
+    ..registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(
         remoteDataSource: injector(),
         localDataSource: injector(),
       ),
     )
     ..registerLazySingleton<SignInUseCase>(() => SignInUseCase(injector()))
     ..registerLazySingleton<LogoutUseCase>(() => LogoutUseCase(injector()))
-    ..registerLazySingleton<RestoreSessionUseCase>(
-      () => RestoreSessionUseCase(injector()),
-    )
-    ..registerFactory<AuthBloc>(
-      () => AuthBloc(
+    ..registerLazySingleton<RestoreSessionUseCase>(() => RestoreSessionUseCase(injector()))
+
+    ..registerFactory<AuthBloc>(() => AuthBloc(
         signInUseCase: injector(),
         logoutUseCase: injector(),
         restoreSessionUseCase: injector(),
       ),
     )
-    // Profile
-    ..registerLazySingleton<ProfileLocalDataSource>(
-      () => ProfileLocalDataSourceImpl(injector()),
-    )
-    ..registerLazySingleton<ProfileRepository>(
-      () => ProfileRepositoryImpl(injector()),
-    )
-    ..registerLazySingleton<GetProfileUseCase>(
-      () => GetProfileUseCase(injector()),
-    )
-    ..registerLazySingleton<UpdateProfileUseCase>(
-      () => UpdateProfileUseCase(injector()),
-    )
-    ..registerFactory<ProfileBloc>(
-      () => ProfileBloc(
+
+  // Profile
+    ..registerLazySingleton<ProfileLocalDataSource>(() => ProfileLocalDataSourceImpl(injector()))
+    ..registerLazySingleton<ProfileRepository>(() => ProfileRepositoryImpl(injector()))
+    ..registerLazySingleton<GetProfileUseCase>(() => GetProfileUseCase(injector()))
+    ..registerLazySingleton<UpdateProfileUseCase>(() => UpdateProfileUseCase(injector()))
+
+    ..registerFactory<ProfileBloc>(() => ProfileBloc(
         getProfileUseCase: injector(),
         updateProfileUseCase: injector(),
       ),
     )
-    // Stocks
+
+  // Stocks
     ..registerFactory<StocksSocketService>(StocksSocketService.new)
     ..registerFactory<StocksDataSource>(() => StocksDataSourceImpl(injector()))
-    ..registerFactory<StocksRepository>(
-      () => StocksRepositoryImpl(injector(), injector()),
-    )
-    ..registerFactory<GetStockDashboardUseCase>(
-      () => GetStockDashboardUseCase(injector()),
-    )
-    ..registerFactory<ConnectLiveIndicesUseCase>(
-      () => ConnectLiveIndicesUseCase(injector()),
-    )
-    ..registerFactory<DisconnectLiveIndicesUseCase>(
-      () => DisconnectLiveIndicesUseCase(injector()),
-    )
-    ..registerFactory<WatchLiveIndicesUseCase>(
-      () => WatchLiveIndicesUseCase(injector()),
-    )
-    ..registerFactory<StocksBloc>(
-      () => StocksBloc(
+    ..registerFactory<StocksRepository>(() => StocksRepositoryImpl(injector(), injector()))
+    ..registerFactory<GetStockDashboardUseCase>(() => GetStockDashboardUseCase(injector()))
+    ..registerFactory<ConnectLiveIndicesUseCase>(() => ConnectLiveIndicesUseCase(injector()))
+    ..registerFactory<DisconnectLiveIndicesUseCase>(() => DisconnectLiveIndicesUseCase(injector()))
+    ..registerFactory<WatchLiveIndicesUseCase>(() => WatchLiveIndicesUseCase(injector()))
+
+    ..registerFactory<StocksBloc>(() => StocksBloc(
         getStockDashboardUseCase: injector(),
         connectLiveIndicesUseCase: injector(),
         disconnectLiveIndicesUseCase: injector(),
