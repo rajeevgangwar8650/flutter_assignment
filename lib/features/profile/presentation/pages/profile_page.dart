@@ -173,14 +173,6 @@ class _ProfileContent extends StatelessWidget {
       ),
     );
   }
-
-  String _initials(String name) {
-    final parts = name.trim().split(RegExp(r'\s+'));
-    if (parts.isEmpty || parts.first.isEmpty) return 'U';
-    final first = parts.first[0];
-    final second = parts.length > 1 && parts[1].isNotEmpty ? parts[1][0] : '';
-    return (first + second).toUpperCase();
-  }
 }
 
 class _ProfileField extends StatelessWidget {

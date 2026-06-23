@@ -47,7 +47,7 @@ class _LoginFormState extends State<LoginForm> {
           current is AuthAuthenticated || current is AuthFailure,
       listener: (context, state) {
         if (state is AuthAuthenticated) {
-          Navigator.of(context).pushReplacementNamed(AppRoutes.profile);
+          Navigator.of(context).pushReplacementNamed(AppRoutes.stocks);
         } else if (state is AuthFailure) {
           SnackbarHelper.showError(context, state.message);
         }

@@ -12,7 +12,7 @@ class SplashPage extends StatelessWidget {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthAuthenticated) {
-          Navigator.of(context).pushReplacementNamed(AppRoutes.profile);
+          Navigator.of(context).pushReplacementNamed(AppRoutes.stocks);
         } else if (state is AuthUnauthenticated || state is AuthFailure) {
           Navigator.of(context).pushReplacementNamed(AppRoutes.login);
         }
