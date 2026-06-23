@@ -22,5 +22,4 @@ class SharedPreferencesService {
   String? getToken() {
     return _preferences.getString(AppConstants.token);
   }
-
 }

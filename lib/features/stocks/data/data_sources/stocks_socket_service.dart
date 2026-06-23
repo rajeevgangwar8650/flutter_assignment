@@ -171,6 +171,9 @@ class StocksSocketService {
     _heartbeatTimer?.cancel();
     _reconnectTimer?.cancel();
     await _closeChannel();
+    if (!_controller.isClosed) {
+      await _controller.close();
+    }
   }
 
   Future<void> _closeChannel() async {

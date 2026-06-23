@@ -116,7 +116,9 @@ Future<void> initDependencies() async {
     // Stocks
     ..registerFactory<StocksSocketService>(StocksSocketService.new)
     ..registerFactory<StocksDataSource>(() => StocksDataSourceImpl(injector()))
-    ..registerFactory<StocksRepository>(() => StocksRepositoryImpl(injector()))
+    ..registerFactory<StocksRepository>(
+      () => StocksRepositoryImpl(injector(), injector()),
+    )
     ..registerFactory<GetStockDashboardUseCase>(
       () => GetStockDashboardUseCase(injector()),
     )

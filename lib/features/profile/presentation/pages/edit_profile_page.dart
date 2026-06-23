@@ -129,7 +129,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         keyboardType: TextInputType.emailAddress,
                         textInputAction: TextInputAction.next,
                         validator: Validators.email,
-                        readOnly: true,
                         prefixIcon: const Icon(Icons.email_outlined),
                       ),
                       const SizedBox(height: 16),

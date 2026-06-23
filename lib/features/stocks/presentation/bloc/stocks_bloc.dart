@@ -9,6 +9,8 @@ import 'stocks_event.dart';
 import 'stocks_state.dart';
 
 class StocksBloc extends Bloc<StocksEvent, StocksState> {
+  static const List<String> _liveFeedSymbols = ['NSEIDX_26000', 'BSEIDX_1'];
+
   final GetStockDashboardUseCase getStockDashboardUseCase;
   final ConnectLiveIndicesUseCase connectLiveIndicesUseCase;
   final DisconnectLiveIndicesUseCase disconnectLiveIndicesUseCase;
@@ -53,12 +55,14 @@ class StocksBloc extends Bloc<StocksEvent, StocksState> {
         final indicesBySymbol = {
           for (final index in dashboard.indices) index.ss: index,
         };
-        final symbols = dashboard.indices.map((index) => index.ss).toList();
+        final displaySymbols = dashboard.indices
+            .map((index) => index.ss)
+            .toList();
 
         emit(
           state.copyWith(
             status: StocksStatus.success,
-            indexOrder: symbols,
+            indexOrder: displaySymbols,
             indicesBySymbol: indicesBySymbol,
             stocks: dashboard.stocks,
             clearError: true,
@@ -66,7 +70,7 @@ class StocksBloc extends Bloc<StocksEvent, StocksState> {
         );
 
         final connectResult = await connectLiveIndicesUseCase(
-          ConnectLiveIndicesParams(symbols),
+          const ConnectLiveIndicesParams(_liveFeedSymbols),
         );
         connectResult.fold(
           (failure) => add(
@@ -99,7 +103,7 @@ class StocksBloc extends Bloc<StocksEvent, StocksState> {
       ),
     );
     final connectResult = await connectLiveIndicesUseCase(
-      ConnectLiveIndicesParams(state.indexOrder),
+      const ConnectLiveIndicesParams(_liveFeedSymbols),
     );
     connectResult.fold(
       (failure) => emit(
