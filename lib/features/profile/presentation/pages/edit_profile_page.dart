@@ -126,6 +126,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       AppTextField(
                         controller: _emailController,
                         label: 'Email',
+                        readOnly: true,
                         keyboardType: TextInputType.emailAddress,
                         textInputAction: TextInputAction.next,
                         validator: Validators.email,
