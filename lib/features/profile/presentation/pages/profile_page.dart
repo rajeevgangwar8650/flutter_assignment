@@ -106,6 +106,7 @@ class _ProfileContent extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+
               CircleAvatar(
                 radius: 52,
                 backgroundColor: Theme.of(context).colorScheme.primaryContainer,
