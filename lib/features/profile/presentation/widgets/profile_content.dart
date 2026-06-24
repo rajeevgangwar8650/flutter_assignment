@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_assignment/core/utils/extension.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../config/routes/app_routes.dart';
@@ -27,29 +28,18 @@ class ProfileContent extends StatelessWidget {
               CircleAvatar(
                 radius: 52,
                 backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                child: Text(
-                  profile.name[0].toUpperCase(),
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
-                    fontWeight: FontWeight.w700,
-                  ),
+                child: profile.name[0].toUpperCase().textExtraLarge(
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
                 ),
               ),
               const SizedBox(height: 24),
-              Text(
-                profile.name,
+              profile.name.textExtraLarge(
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
               ),
               const SizedBox(height: 4),
-              Text(
-                profile.email,
+              profile.email.textRegular(
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
               const SizedBox(height: 28),
               _ProfileField(
@@ -79,7 +69,7 @@ class ProfileContent extends StatelessWidget {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                           : const Icon(Icons.logout),
-                      label: const Text('Logout'),
+                      label: "Logout".textMedium(),
                     ),
                   );
                 },
@@ -120,9 +110,9 @@ class _ProfileField extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label, style: Theme.of(context).textTheme.labelLarge),
+                label.textRegular(),
                 const SizedBox(height: 4),
-                Text(value),
+                value.textRegular(),
               ],
             ),
           ),

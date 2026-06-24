@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_assignment/core/utils/extension.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../config/routes/app_routes.dart';
 import '../../../../core/utils/snackbar_helper.dart';
@@ -37,7 +38,6 @@ class _StocksPageState extends State<StocksPage> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state != AppLifecycleState.resumed || !mounted) return;
-
     final bloc = context.read<StocksBloc>();
     if (bloc.state.hasData) {
       bloc.add(const StocksRetryRequested());
@@ -48,7 +48,7 @@ class _StocksPageState extends State<StocksPage> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Markets'),
+        title: "Markets".textLarge(),
         actions: [
           IconButton(
             tooltip: 'Profile',
@@ -119,12 +119,7 @@ class _StocksPageState extends State<StocksPage> with WidgetsBindingObserver {
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 24, 16, 12),
-        child: Text(
-          text,
-          style: Theme.of(
-            context,
-          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
-        ),
+        child: text.textExtraLarge(fontSize: 20),
       ),
     );
   }

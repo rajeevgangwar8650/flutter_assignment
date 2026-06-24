@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_assignment/core/utils/extension.dart';
 
 class LoadingWidget extends StatelessWidget {
   final String? message;
@@ -14,7 +15,7 @@ class LoadingWidget extends StatelessWidget {
           const CircularProgressIndicator(),
           if (message != null) ...[
             const SizedBox(height: 16),
-            Text(message!, textAlign: TextAlign.center),
+            message!.textMedium(textAlign: TextAlign.center),
           ],
         ],
       ),

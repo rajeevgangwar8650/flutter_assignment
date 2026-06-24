@@ -4,7 +4,6 @@ class StockDashboardModel extends StockDashboardEntity {
   const StockDashboardModel({
     required super.indices,
     required super.stocks,
-    required super.declines,
   });
 
   factory StockDashboardModel.fromJson(Map<String, dynamic> json) {
@@ -20,7 +19,6 @@ class StockDashboardModel extends StockDashboardEntity {
           .whereType<Map<String, dynamic>>()
           .map(StockItemModel.fromJson)
           .toList(growable: false),
-      declines: json['declines'] as int? ?? 0,
     );
   }
 }

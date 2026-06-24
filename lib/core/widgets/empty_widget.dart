@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_assignment/core/utils/extension.dart';
 
 class EmptyWidget extends StatelessWidget {
   final String message;
@@ -20,7 +21,7 @@ class EmptyWidget extends StatelessWidget {
           children: [
             Icon(icon, size: 40, color: Theme.of(context).colorScheme.outline),
             const SizedBox(height: 12),
-            Text(message, textAlign: TextAlign.center),
+            message.textMedium(textAlign: TextAlign.center)
           ],
         ),
       ),

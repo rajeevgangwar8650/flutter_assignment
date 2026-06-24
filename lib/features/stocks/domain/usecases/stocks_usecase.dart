@@ -6,8 +6,7 @@ import '../../../../core/usecases/usecase.dart';
 import '../entities/stocks_entity.dart';
 import '../repositories/stocks_repository.dart';
 
-class GetStockDashboardUseCase
-    implements UseCase<StockDashboardEntity, NoParams> {
+class GetStockDashboardUseCase implements UseCase<StockDashboardEntity, NoParams> {
   final StocksRepository repository;
 
   const GetStockDashboardUseCase(this.repository);

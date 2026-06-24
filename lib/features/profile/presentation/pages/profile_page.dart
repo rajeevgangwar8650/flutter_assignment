@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_assignment/core/utils/extension.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../config/routes/app_routes.dart';
@@ -54,7 +55,7 @@ class _ProfilePageState extends State<ProfilePage> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(title: const Text('Profile')),
+        appBar: AppBar(title: "Profile".textLarge(),),
         body: BlocConsumer<ProfileBloc, ProfileState>(
           listenWhen: (previous, current) =>
               current is ProfileFailure ||

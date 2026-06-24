@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_assignment/core/utils/extension.dart';
 import 'package:flutter_assignment/features/stocks/presentation/widgets/stocks_widget.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/widgets/empty_widget.dart';
@@ -75,22 +76,14 @@ class _LiveIndexCardState extends State<LiveIndexCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            index.symbol,
+          index.symbol.textMedium(
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+            fontWeight: FontWeight.w700
           ),
           const Spacer(),
-          Text(
-            formatNumber(index.currentValue),
-            style: Theme.of(
-              context,
-            ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
-          ),
-          const SizedBox(height: 8),
+          formatNumber(index.currentValue).textExtraLarge(fontSize: 22),
+          const SizedBox(height: 6),
           Row(
             children: [
               Icon(
@@ -98,16 +91,13 @@ class _LiveIndexCardState extends State<LiveIndexCard> {
                 size: 18,
                 color: changeColor,
               ),
-              const SizedBox(width: 6),
+              const SizedBox(width: 4),
               Flexible(
-                child: Text(
-                  '${formatSigned(index.change)} (${formatSigned(index.changePercent)}%)',
+                child: '${formatSigned(index.change)} (${formatSigned(index.changePercent)}%)'.textRegular(
                   maxLines: 1,
+                  color: changeColor,
+                  fontWeight: FontWeight.w700,
                   overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: changeColor,
-                    fontWeight: FontWeight.w700,
-                  ),
                 ),
               ),
             ],

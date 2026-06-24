@@ -3,16 +3,14 @@ import 'package:equatable/equatable.dart';
 class StockDashboardEntity extends Equatable {
   final List<StockIndexEntity> indices;
   final List<StockItemEntity> stocks;
-  final int declines;
 
   const StockDashboardEntity({
     required this.indices,
     required this.stocks,
-    required this.declines,
   });
 
   @override
-  List<Object> get props => [indices, stocks, declines];
+  List<Object> get props => [indices, stocks];
 }
 
 class StockIndexEntity extends Equatable {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_assignment/core/utils/extension.dart';
 
 class AppErrorWidget extends StatelessWidget {
   final String message;
@@ -20,14 +21,10 @@ class AppErrorWidget extends StatelessWidget {
               size: 40,
             ),
             const SizedBox(height: 12),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
-            ),
+            message.textMedium(textAlign: TextAlign.center,color: Theme.of(context).colorScheme.error),
             if (onRetry != null) ...[
               const SizedBox(height: 16),
-              OutlinedButton(onPressed: onRetry, child: const Text('Retry')),
+              OutlinedButton(onPressed: onRetry, child: "Retry".textRegular()),
             ],
           ],
         ),

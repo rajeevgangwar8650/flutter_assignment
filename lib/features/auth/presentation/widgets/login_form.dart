@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_assignment/core/utils/extension.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../config/routes/app_routes.dart';
@@ -68,18 +69,13 @@ class _LoginFormState extends State<LoginForm> {
                 color: Theme.of(context).colorScheme.primary,
               ),
               const SizedBox(height: 24),
-              Text(
-                'Sign in',
+              'Sign in'.textExtraLarge(
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
+                fontSize: 25
               ),
               const SizedBox(height: 8),
-              Text(
-                'Welcome back to your market workspace.',
+              'Welcome back to your market workspace.'.textRegular(
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyMedium,
               ),
               const SizedBox(height: 32),
               AppTextField(
@@ -111,9 +107,8 @@ class _LoginFormState extends State<LoginForm> {
               ),
               if (failureMessage != null) ...[
                 const SizedBox(height: 16),
-                Text(
-                  failureMessage,
-                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+                failureMessage.textRegular(
+                    color: Theme.of(context).colorScheme.error
                 ),
               ],
               const SizedBox(height: 24),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/utils/extension.dart';
 import '../../../../core/utils/snackbar_helper.dart';
 import '../../../../core/utils/validators.dart';
 import '../../../../core/widgets/app_button.dart';
@@ -70,7 +71,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Edit Profile')),
+      appBar: AppBar(title: "Edit Profile".textLarge()),
       body: BlocConsumer<ProfileBloc, ProfileState>(
         listenWhen: (previous, current) =>
             current is ProfileSuccess || current is ProfileFailure,
@@ -155,7 +156,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               ? null
                               : () => Navigator.of(context).pop(),
                           icon: const Icon(Icons.close),
-                          label: const Text('Cancel'),
+                          label: "Cancel".textMedium(),
                         ),
                       ),
                     ],

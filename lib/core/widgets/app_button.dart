@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_assignment/core/utils/extension.dart';
 
 class PrimaryButton extends StatelessWidget {
   final String label;
@@ -29,7 +30,7 @@ class PrimaryButton extends StatelessWidget {
                 Icon(icon, size: 18),
                 const SizedBox(width: 8),
               ],
-              Flexible(child: Text(label, textAlign: TextAlign.center)),
+              Flexible(child: label.textMedium(textAlign: TextAlign.center)),
             ],
           );
 
@@ -42,14 +43,4 @@ class PrimaryButton extends StatelessWidget {
       ),
     );
   }
-}
-
-class AppButton extends PrimaryButton {
-  const AppButton({
-    super.key,
-    required super.label,
-    required super.onPressed,
-    super.isLoading,
-    super.icon,
-  });
 }

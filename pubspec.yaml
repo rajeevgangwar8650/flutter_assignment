@@ -19,6 +19,7 @@ dependencies:
   internet_connection_checker: ^3.0.1
   dartz: ^0.10.1
   web_socket_channel: ^3.0.3
+  google_fonts: ^8.0.2
 
 dev_dependencies:
   flutter_test:

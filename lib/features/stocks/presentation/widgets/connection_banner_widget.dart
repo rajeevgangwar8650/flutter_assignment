@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_assignment/core/utils/extension.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/entities/stocks_entity.dart';
 import '../bloc/stocks_bloc.dart';
@@ -50,13 +51,7 @@ class ConnectionBannerWidget extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: Text(
-                  _labelFor(data),
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: color,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+                child: _labelFor(data).textMedium(color: color),
               ),
               if (isProblem)
                 TextButton(
@@ -65,7 +60,7 @@ class ConnectionBannerWidget extends StatelessWidget {
                       const StocksRetryRequested(),
                     );
                   },
-                  child: const Text('Retry'),
+                  child: 'Retry'.textMedium(),
                 ),
             ],
           ),

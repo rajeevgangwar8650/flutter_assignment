@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_assignment/core/utils/extension.dart';
 
 class MarketHeader extends StatelessWidget {
   final int stocks;
@@ -23,20 +24,9 @@ class MarketHeader extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Stock Watch',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: colorScheme.onPrimaryContainer,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
+                  'Stock Watch'.textExtraLarge(color: colorScheme.onPrimaryContainer),
                   const SizedBox(height: 6),
-                  Text(
-                    '$stocks companies from the dataset',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onPrimaryContainer,
-                    ),
-                  ),
+                  '$stocks companies from the dataset'.textRegular(color: colorScheme.onPrimaryContainer),
                 ],
               ),
             ),

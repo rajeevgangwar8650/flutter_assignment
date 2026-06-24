@@ -22,10 +22,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthLogoutRequested>(_onLogoutRequested);
   }
 
-  Future<void> _onSessionRestoreRequested(
-    AuthSessionRestoreRequested event,
-    Emitter<AuthState> emit,
-  ) async {
+  Future<void> _onSessionRestoreRequested(AuthSessionRestoreRequested event, Emitter<AuthState> emit) async {
     emit(const AuthLoading());
     final result = await restoreSessionUseCase(NoParams());
     result.fold(
@@ -36,10 +33,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
   }
 
-  Future<void> _onSignInSubmitted(
-    AuthSignInSubmitted event,
-    Emitter<AuthState> emit,
-  ) async {
+  Future<void> _onSignInSubmitted(AuthSignInSubmitted event, Emitter<AuthState> emit) async {
     emit(const AuthLoading());
     final result = await signInUseCase(
       SignInParams(email: event.email, password: event.password),
@@ -50,10 +44,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
   }
 
-  Future<void> _onLogoutRequested(
-    AuthLogoutRequested event,
-    Emitter<AuthState> emit,
-  ) async {
+  Future<void> _onLogoutRequested(AuthLogoutRequested event, Emitter<AuthState> emit) async {
     emit(const AuthLoading());
     final result = await logoutUseCase(NoParams());
     result.fold(

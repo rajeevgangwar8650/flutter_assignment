@@ -13,7 +13,6 @@ abstract class AuthLocalDataSource {
 
 class AuthLocalDataSourceImpl implements AuthLocalDataSource {
   final SharedPreferencesService preferencesService;
-
   const AuthLocalDataSourceImpl(this.preferencesService);
 
   @override

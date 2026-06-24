@@ -1,7 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-
-import '../errors/exceptions.dart';
 import '../services/logger_service.dart';
 
 class AppLoggingInterceptor extends Interceptor {
@@ -35,19 +33,5 @@ class AppErrorInterceptor extends Interceptor {
       debugPrint('Network error: ${err.requestOptions.uri} ${err.message}');
     }
     super.onError(err, handler);
-  }
-}
-
-class DioInterceptor extends AppLoggingInterceptor {
-  DioInterceptor({required super.logger});
-}
-
-extension DioExceptionMapper on DioException {
-  ApiException toApiException() {
-    final data = response?.data;
-    final message = data is Map<String, dynamic> && data['message'] is String
-        ? data['message'] as String
-        : this.message ?? 'Request failed.';
-    return ApiException(message, statusCode: response?.statusCode);
   }
 }

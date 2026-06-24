@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_assignment/core/utils/extension.dart';
 import '../../../../core/widgets/empty_widget.dart';
 import '../../domain/entities/stocks_entity.dart';
 
@@ -56,13 +57,10 @@ class StockListCard extends StatelessWidget {
             Row(
               children: [
                 Expanded(
-                  child: Text(
-                    stock.symbol,
+                  child: stock.symbol.textMedium(
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
                 _Pill(label: stock.exchange),
@@ -72,19 +70,13 @@ class StockListCard extends StatelessWidget {
             Row(
               children: [
                 Expanded(
-                  child: Text(
-                    _formatCurrency(stock.currentPrice),
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
+                  child: _formatCurrency(stock.currentPrice).textExtraLarge(
+                    fontSize: 20
                   ),
                 ),
-                Text(
-                  '${formatSigned(stock.priceChange)} (${formatSigned(stock.percentageChange)}%)',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: changeColor,
-                    fontWeight: FontWeight.w700,
-                  ),
+                '${formatSigned(stock.priceChange)} (${formatSigned(stock.percentageChange)}%)'.textRegular(
+                  color: changeColor,
+                  fontWeight: FontWeight.w700,
                 ),
               ],
             ),
@@ -100,21 +92,13 @@ class StockListCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 6),
                 Expanded(
-                  child: Text(
-                    stock.hasHoldings
-                        ? 'Holdings: ${stock.holdings}'
-                        : 'No holdings',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
+                  child: (stock.hasHoldings ? 'Holdings: ${stock.holdings}' : 'No holdings').textSmall(
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 ),
-                Text(
-                  stock.type,
-                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                    fontWeight: FontWeight.w700,
-                  ),
+                stock.type.textSmall(
+                  color: colorScheme.onSurfaceVariant,
+                  fontWeight: FontWeight.w700,
                 ),
               ],
             ),
@@ -139,12 +123,9 @@ class _Pill extends StatelessWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-        child: Text(
-          label,
-          style: Theme.of(context).textTheme.labelMedium?.copyWith(
-            color: Theme.of(context).colorScheme.onPrimaryContainer,
-            fontWeight: FontWeight.w700,
-          ),
+        child: label.textSmall(
+          color: Theme.of(context).colorScheme.onPrimaryContainer,
+          fontWeight: FontWeight.w800,
         ),
       ),
     );

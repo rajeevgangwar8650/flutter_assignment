@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_assignment/core/utils/extension.dart';
 
 class SnackbarHelper {
   static void showSuccess(BuildContext context, String message) {
@@ -22,7 +23,7 @@ class SnackbarHelper {
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
-          content: Text(message),
+          content: message.textMedium(),
           backgroundColor: backgroundColor,
           behavior: SnackBarBehavior.floating,
         ),

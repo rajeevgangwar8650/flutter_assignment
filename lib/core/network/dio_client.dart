@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-
 import '../constants/api_constants.dart';
 import '../errors/error_handler.dart';
 import '../errors/exceptions.dart';
@@ -35,22 +34,7 @@ class ApiClient {
     return dio;
   }
 
-  Future<NetworkResult<T>> get<T>(
-      String path, {
-        T Function(dynamic data)? decoder,
-        Map<String, dynamic>? queryParameters,
-      }) async {
-    return _request<T>(
-          () => dio.get<dynamic>(
-        path,
-        queryParameters: queryParameters,
-      ),
-      decoder: decoder,
-    );
-  }
-
-  Future<NetworkResult<T>> post<T>(
-      String path, {
+  Future<NetworkResult<T>> post<T>(String path, {
         Object? data,
         T Function(dynamic data)? decoder,
       }) async {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_assignment/core/utils/extension.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../config/routes/app_routes.dart';
 import '../bloc/auth_bloc.dart';
@@ -28,12 +29,7 @@ class SplashPage extends StatelessWidget {
                 color: Theme.of(context).colorScheme.primary,
               ),
               const SizedBox(height: 24),
-              Text(
-                'Welcome',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              'Welcome'.textExtraLarge(),
               const SizedBox(height: 24),
               const CircularProgressIndicator(),
             ],
