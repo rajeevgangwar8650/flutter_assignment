@@ -30,6 +30,14 @@ class App extends StatelessWidget {
         initialRoute: AppRoutes.splash,
         debugShowCheckedModeBanner: false,
         onGenerateRoute: RouteGenerator.generate,
+        builder: (context, child) {
+          return MediaQuery(
+            data: MediaQuery.of(context).copyWith(
+              textScaler: const TextScaler.linear(1.0), // Fixed text scale
+            ),
+            child: child!,
+          );
+        },
       ),
     );
   }
