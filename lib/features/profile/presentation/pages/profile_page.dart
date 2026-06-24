@@ -4,14 +4,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../config/routes/app_routes.dart';
 import '../../../../core/utils/dialog_helper.dart';
 import '../../../../core/utils/snackbar_helper.dart';
-import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/empty_widget.dart';
 import '../../../../core/widgets/error_widget.dart';
 import '../../../../core/widgets/loading_widget.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_event.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
-import '../../domain/entities/profile_entity.dart';
 import '../bloc/profile_bloc.dart';
 import '../bloc/profile_event.dart';
 import '../bloc/profile_state.dart';
@@ -90,4 +88,3 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 }
-

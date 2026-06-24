@@ -37,64 +37,96 @@ Future<void> initDependencies() async {
   injector
     ..registerLazySingleton<SharedPreferences>(() => sharedPreferences)
     ..registerLazySingleton<LoggerService>(LoggerService.new)
-    ..registerLazySingleton<SharedPreferencesService>(() => SharedPreferencesService(injector()))
-    ..registerLazySingleton<InternetConnectionChecker>(() => InternetConnectionChecker.instance)
+    ..registerLazySingleton<SharedPreferencesService>(
+      () => SharedPreferencesService(injector()),
+    )
+    ..registerLazySingleton<InternetConnectionChecker>(
+      () => InternetConnectionChecker.instance,
+    )
     ..registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(injector()))
-    ..registerLazySingleton<AppLoggingInterceptor>(() => AppLoggingInterceptor(logger: injector()))
+    ..registerLazySingleton<AppLoggingInterceptor>(
+      () => AppLoggingInterceptor(logger: injector()),
+    )
     ..registerLazySingleton<AppErrorInterceptor>(AppErrorInterceptor.new)
-
-    ..registerLazySingleton<Dio>(() => ApiClient.createDio(
+    ..registerLazySingleton<Dio>(
+      () => ApiClient.createDio(
         loggingInterceptor: injector(),
         errorInterceptor: injector(),
       ),
     )
     ..registerLazySingleton<ApiClient>(() => ApiClient(injector()))
-
-  // Auth
-    ..registerLazySingleton<AuthRemoteDataSource>(() => AuthRemoteDataSourceImpl(injector()))
-    ..registerLazySingleton<AuthLocalDataSource>(() => AuthLocalDataSourceImpl(injector()))
-    ..registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(
+    // Auth
+    ..registerLazySingleton<AuthRemoteDataSource>(
+      () => AuthRemoteDataSourceImpl(injector()),
+    )
+    ..registerLazySingleton<AuthLocalDataSource>(
+      () => AuthLocalDataSourceImpl(injector()),
+    )
+    ..registerLazySingleton<AuthRepository>(
+      () => AuthRepositoryImpl(
         remoteDataSource: injector(),
         localDataSource: injector(),
       ),
     )
     ..registerLazySingleton<SignInUseCase>(() => SignInUseCase(injector()))
     ..registerLazySingleton<LogoutUseCase>(() => LogoutUseCase(injector()))
-    ..registerLazySingleton<RestoreSessionUseCase>(() => RestoreSessionUseCase(injector()))
-
-    ..registerFactory<AuthBloc>(() => AuthBloc(
+    ..registerLazySingleton<RestoreSessionUseCase>(
+      () => RestoreSessionUseCase(injector()),
+    )
+    ..registerFactory<AuthBloc>(
+      () => AuthBloc(
         signInUseCase: injector(),
         logoutUseCase: injector(),
         restoreSessionUseCase: injector(),
       ),
     )
-
-  // Profile
-    ..registerLazySingleton<ProfileLocalDataSource>(() => ProfileLocalDataSourceImpl(injector()))
-    ..registerLazySingleton<ProfileRepository>(() => ProfileRepositoryImpl(injector()))
-    ..registerLazySingleton<GetProfileUseCase>(() => GetProfileUseCase(injector()))
-    ..registerLazySingleton<UpdateProfileUseCase>(() => UpdateProfileUseCase(injector()))
-
-    ..registerFactory<ProfileBloc>(() => ProfileBloc(
+    // Profile
+    ..registerLazySingleton<ProfileLocalDataSource>(
+      () => ProfileLocalDataSourceImpl(injector()),
+    )
+    ..registerLazySingleton<ProfileRepository>(
+      () => ProfileRepositoryImpl(injector()),
+    )
+    ..registerLazySingleton<GetProfileUseCase>(
+      () => GetProfileUseCase(injector()),
+    )
+    ..registerLazySingleton<UpdateProfileUseCase>(
+      () => UpdateProfileUseCase(injector()),
+    )
+    ..registerFactory<ProfileBloc>(
+      () => ProfileBloc(
         getProfileUseCase: injector(),
         updateProfileUseCase: injector(),
       ),
     )
-
-  // Stocks
+    // Stocks
     ..registerFactory<StocksSocketService>(StocksSocketService.new)
     ..registerFactory<StocksDataSource>(() => StocksDataSourceImpl(injector()))
-    ..registerFactory<StocksRepository>(() => StocksRepositoryImpl(injector(), injector()))
-    ..registerFactory<GetStockDashboardUseCase>(() => GetStockDashboardUseCase(injector()))
-    ..registerFactory<ConnectLiveIndicesUseCase>(() => ConnectLiveIndicesUseCase(injector()))
-    ..registerFactory<DisconnectLiveIndicesUseCase>(() => DisconnectLiveIndicesUseCase(injector()))
-    ..registerFactory<WatchLiveIndicesUseCase>(() => WatchLiveIndicesUseCase(injector()))
+    ..registerFactory<StocksRepository>(
+      () => StocksRepositoryImpl(injector(), injector()),
+    )
+    ..registerFactory<GetStockDashboardUseCase>(
+      () => GetStockDashboardUseCase(injector()),
+    )
+    ..registerFactory<ConnectLiveIndicesUseCase>(
+      () => ConnectLiveIndicesUseCase(injector()),
+    )
+    ..registerFactory<DisconnectLiveIndicesUseCase>(
+      () => DisconnectLiveIndicesUseCase(injector()),
+    )
+    ..registerFactory<WatchLiveIndicesUseCase>(
+      () => WatchLiveIndicesUseCase(injector()),
+    )
+    ..registerFactory<StocksBloc>(() {
+      final socketService = StocksSocketService();
+      final dataSource = StocksDataSourceImpl(socketService);
+      final repository = StocksRepositoryImpl(dataSource, injector());
 
-    ..registerFactory<StocksBloc>(() => StocksBloc(
-        getStockDashboardUseCase: injector(),
-        connectLiveIndicesUseCase: injector(),
-        disconnectLiveIndicesUseCase: injector(),
-        watchLiveIndicesUseCase: injector(),
-      ),
-    );
+      return StocksBloc(
+        getStockDashboardUseCase: GetStockDashboardUseCase(repository),
+        connectLiveIndicesUseCase: ConnectLiveIndicesUseCase(repository),
+        disconnectLiveIndicesUseCase: DisconnectLiveIndicesUseCase(repository),
+        watchLiveIndicesUseCase: WatchLiveIndicesUseCase(repository),
+      );
+    });
 }

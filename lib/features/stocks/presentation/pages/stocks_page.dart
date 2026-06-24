@@ -5,6 +5,7 @@ import '../../../../core/utils/snackbar_helper.dart';
 import '../../../../core/widgets/empty_widget.dart';
 import '../../../../core/widgets/error_widget.dart';
 import '../../../../core/widgets/loading_widget.dart';
+import '../../domain/entities/stocks_entity.dart';
 import '../bloc/stocks_bloc.dart';
 import '../bloc/stocks_event.dart';
 import '../bloc/stocks_state.dart';
@@ -13,8 +14,35 @@ import '../widgets/indices_widget.dart';
 import '../widgets/market_header_widget.dart';
 import '../widgets/stocks_widget.dart';
 
-class StocksPage extends StatelessWidget {
+class StocksPage extends StatefulWidget {
   const StocksPage({super.key});
+
+  @override
+  State<StocksPage> createState() => _StocksPageState();
+}
+
+class _StocksPageState extends State<StocksPage> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed || !mounted) return;
+
+    final bloc = context.read<StocksBloc>();
+    if (bloc.state.hasData) {
+      bloc.add(const StocksRetryRequested());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +60,9 @@ class StocksPage extends StatelessWidget {
       body: BlocConsumer<StocksBloc, StocksState>(
         listenWhen: (previous, current) =>
             previous.errorMessage != current.errorMessage &&
-            current.errorMessage != null,
+            current.errorMessage != null &&
+            (current.status == StocksStatus.failure ||
+                current.socketStatus == StockSocketStatus.failed),
         listener: (context, state) {
           SnackbarHelper.showError(context, state.errorMessage!);
         },
@@ -82,18 +112,20 @@ class StocksPage extends StatelessWidget {
     );
   }
 
-  SliverToBoxAdapter _headingText({required String text,required BuildContext context}){
+  SliverToBoxAdapter _headingText({
+    required String text,
+    required BuildContext context,
+  }) {
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 24, 16, 12),
         child: Text(
           text,
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.w800,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
         ),
       ),
     );
   }
 }
-

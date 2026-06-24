@@ -1,13 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
-
+import 'package:flutter_assignment/core/constants/api_constants.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
-
 import '../models/stocks_model.dart';
 import '../../domain/entities/stocks_entity.dart';
 
 class StocksSocketService {
-  static final Uri _socketUri = Uri.parse('wss://streamer.ysil.in/');
+  static final Uri _socketUri = Uri.parse(ApiConstants.socketUrl);
   static const int _maxReconnectAttempts = 5;
 
   final StreamController<StockSocketEventEntity> _controller =
@@ -24,19 +23,18 @@ class StocksSocketService {
   Stream<StockSocketEventEntity> get stream => _controller.stream;
 
   Future<void> connect(List<String> symbols) async {
-    _symbols = symbols;
+    _symbols = symbols
+        .where((symbol) => symbol.trim().isNotEmpty)
+        .toList(growable: false);
     _manualClose = false;
     _reconnectAttempts = 0;
+    _heartbeatTimer?.cancel();
+    _reconnectTimer?.cancel();
     await _open(isReconnect: false);
   }
 
-  Future<void> reconnect() async {
-    _manualClose = false;
-    _reconnectAttempts = 0;
-    await _open(isReconnect: true);
-  }
-
   Future<void> _open({required bool isReconnect}) async {
+    _heartbeatTimer?.cancel();
     await _closeChannel();
     _emit(
       StockSocketEventEntity(
@@ -77,6 +75,7 @@ class StocksSocketService {
       _subscribe();
       _startHeartbeat();
     } catch (error) {
+      await _closeChannel();
       _emit(
         StockSocketEventEntity(
           status: StockSocketStatus.disconnected,
@@ -88,7 +87,9 @@ class StocksSocketService {
   }
 
   void _subscribe() {
-    if (_symbols.isEmpty) return;
+    if (_symbols.isEmpty) {
+      return;
+    }
     _send(<String, dynamic>{
       'action': 'subscribe',
       'type': 'freefeed',
@@ -97,17 +98,19 @@ class StocksSocketService {
   }
 
   void _handleMessage(dynamic message) {
-    if (message is! String || message.trim().isEmpty) return;
-    final payload = message.trim();
+    final payload = _decodeMessage(message);
+    if (payload == null) return;
 
-    if (!payload.contains('|')) return;
+    if (payload.isEmpty || _isJsonPayload(payload) || !payload.contains('|')) {
+      return;
+    }
 
     try {
       final tick = StockTickModel.fromSocketPayload(payload);
       _emit(
         StockSocketEventEntity(status: StockSocketStatus.connected, tick: tick),
       );
-    } catch (error) {
+    } catch (_) {
       _emit(
         StockSocketEventEntity(
           status: StockSocketStatus.connected,
@@ -115,6 +118,26 @@ class StocksSocketService {
         ),
       );
     }
+  }
+
+  String? _decodeMessage(dynamic message) {
+    if (message is String) {
+      return message.trim();
+    }
+
+    if (message is List<int>) {
+      try {
+        return utf8.decode(message).trim();
+      } catch (_) {
+        return null;
+      }
+    }
+
+    return null;
+  }
+
+  bool _isJsonPayload(String payload) {
+    return payload.startsWith('{') || payload.startsWith('[');
   }
 
   void _startHeartbeat() {
@@ -126,14 +149,17 @@ class StocksSocketService {
 
   void _send(Map<String, dynamic> payload) {
     try {
-      _channel?.sink.add(jsonEncode(payload));
+      final data = jsonEncode(payload);
+      _channel?.sink.add(data);
     } catch (_) {
       _scheduleReconnect();
     }
   }
 
   void _scheduleReconnect() {
-    if (_manualClose) return;
+    if (_manualClose) {
+      return;
+    }
     _heartbeatTimer?.cancel();
     _reconnectTimer?.cancel();
 
@@ -177,9 +203,15 @@ class StocksSocketService {
   }
 
   Future<void> _closeChannel() async {
+    final channel = _channel;
+    _channel = null;
+
     await _subscription?.cancel();
     _subscription = null;
-    await _channel?.sink.close();
-    _channel = null;
+    if (channel == null) return;
+
+    try {
+      await channel.sink.close().timeout(const Duration(seconds: 2));
+    } catch (_) {}
   }
 }

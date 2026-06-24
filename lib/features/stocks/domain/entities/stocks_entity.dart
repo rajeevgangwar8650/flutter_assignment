@@ -118,6 +118,28 @@ class StockItemEntity extends Equatable {
 
   bool get isPositive => priceChange >= 0;
 
+  StockItemEntity copyWith({
+    String? symbol,
+    String? ss,
+    String? exchange,
+    String? type,
+    int? holdings,
+    double? currentPrice,
+    double? priceChange,
+    double? percentageChange,
+  }) {
+    return StockItemEntity(
+      symbol: symbol ?? this.symbol,
+      ss: ss ?? this.ss,
+      exchange: exchange ?? this.exchange,
+      type: type ?? this.type,
+      holdings: holdings ?? this.holdings,
+      currentPrice: currentPrice ?? this.currentPrice,
+      priceChange: priceChange ?? this.priceChange,
+      percentageChange: percentageChange ?? this.percentageChange,
+    );
+  }
+
   @override
   List<Object> get props => [
     symbol,

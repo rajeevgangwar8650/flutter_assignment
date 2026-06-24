@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../../../../core/widgets/empty_widget.dart';
 import '../../domain/entities/stocks_entity.dart';
 
@@ -15,7 +14,6 @@ class StocksWidget extends StatelessWidget {
         child: EmptyWidget(message: 'No stocks available.'),
       );
     }
-
     return SliverPadding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
       sliver: SliverGrid.builder(

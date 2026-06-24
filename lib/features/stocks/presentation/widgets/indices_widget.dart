@@ -1,9 +1,6 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_assignment/features/stocks/presentation/widgets/stocks_widget.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import '../../../../core/widgets/empty_widget.dart';
 import '../../domain/entities/stocks_entity.dart';
 import '../bloc/stocks_bloc.dart';
@@ -14,34 +11,30 @@ class IndicesWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<StocksBloc, StocksState, List<String>>(
-      selector: (state) => state.indexOrder,
-      builder: (context, symbols) {
-        if (symbols.isEmpty) {
+    return BlocBuilder<StocksBloc, StocksState>(
+      buildWhen: (previous, current) =>
+          previous.indexOrder != current.indexOrder ||
+          previous.indicesBySymbol != current.indicesBySymbol,
+      builder: (context, state) {
+        final indices = state.indices;
+        if (indices.isEmpty) {
           return const SizedBox(
             height: 150,
             child: EmptyWidget(message: 'No indices available.'),
           );
         }
-
         return SizedBox(
           height: 154,
           child: ListView.separated(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             scrollDirection: Axis.horizontal,
-            itemCount: symbols.length,
+            itemCount: indices.length,
             separatorBuilder: (context, index) => const SizedBox(width: 12),
             itemBuilder: (context, index) {
-              final symbol = symbols[index];
-              return BlocSelector<StocksBloc, StocksState, StockIndexEntity?>(
-                selector: (state) => state.indicesBySymbol[symbol],
-                builder: (context, indexEntity) {
-                  if (indexEntity == null) return const SizedBox.shrink();
-                  return LiveIndexCard(
-                    key: ValueKey(symbol),
-                    index: indexEntity,
-                  );
-                },
+              final liveIndex = indices[index];
+              return LiveIndexCard(
+                key: ValueKey(liveIndex.ss),
+                index: liveIndex,
               );
             },
           ),
@@ -59,35 +52,8 @@ class LiveIndexCard extends StatefulWidget {
   @override
   State<LiveIndexCard> createState() => _LiveIndexCardState();
 }
+
 class _LiveIndexCardState extends State<LiveIndexCard> {
-  Timer? _flashTimer;
-  Color? _flashColor;
-
-  @override
-  void didUpdateWidget(covariant LiveIndexCard oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.index.currentValue == widget.index.currentValue) return;
-
-    final direction = widget.index.currentValue > oldWidget.index.currentValue
-        ? PriceDirection.up
-        : PriceDirection.down;
-    _flashTimer?.cancel();
-    setState(() {
-      _flashColor = direction == PriceDirection.up
-          ? Colors.green.withValues(alpha: 0.18)
-          : Colors.red.withValues(alpha: 0.18);
-    });
-    _flashTimer = Timer(const Duration(milliseconds: 450), () {
-      if (mounted) setState(() => _flashColor = null);
-    });
-  }
-
-  @override
-  void dispose() {
-    _flashTimer?.cancel();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     final index = widget.index;
@@ -95,7 +61,6 @@ class _LiveIndexCardState extends State<LiveIndexCard> {
     final changeColor = index.isPositive
         ? Colors.green.shade700
         : Colors.red.shade700;
-    final backgroundColor = _flashColor ?? colorScheme.surfaceContainerHighest;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 220),
@@ -103,7 +68,7 @@ class _LiveIndexCardState extends State<LiveIndexCard> {
       width: 222,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: backgroundColor,
+        color: changeColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: colorScheme.outlineVariant),
       ),
