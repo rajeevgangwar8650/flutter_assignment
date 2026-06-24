@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter_assignment/core/constants/api_constants.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
-import '../models/stocks_model.dart';
-import '../../domain/entities/stocks_entity.dart';
+import '../../features/stocks/data/models/stocks_model.dart';
+import '../../features/stocks/domain/entities/stocks_entity.dart';
 
 class StocksSocketService {
   static final Uri _socketUri = Uri.parse(ApiConstants.socketUrl);

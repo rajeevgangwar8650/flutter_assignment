@@ -21,7 +21,7 @@ import '../../features/profile/domain/repositories/profile_repository.dart';
 import '../../features/profile/domain/usecases/profile_usecase.dart';
 import '../../features/profile/presentation/bloc/profile_bloc.dart';
 import '../../features/stocks/data/data_sources/stocks_data_source.dart';
-import '../../features/stocks/data/data_sources/stocks_socket_service.dart';
+import '../../core/services/stocks_socket_service.dart';
 import '../../features/stocks/data/repositories/stocks_repository_imp.dart';
 import '../../features/stocks/domain/repositories/stocks_repository.dart';
 import '../../features/stocks/domain/usecases/stocks_usecase.dart';

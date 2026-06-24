@@ -1,6 +1,6 @@
 import '../models/stocks_model.dart';
 import '../../domain/entities/stocks_entity.dart';
-import 'stocks_socket_service.dart';
+import '../../../../core/services/stocks_socket_service.dart';
 
 abstract class StocksDataSource {
   Future<StockDashboardModel> getStockDashboard();
