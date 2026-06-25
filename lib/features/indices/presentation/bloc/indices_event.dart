@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../../core/services/market_socket_service.dart';
+import '../../domain/entities/live_indices_event.dart';
 
 abstract class IndicesEvent extends Equatable {
   const IndicesEvent();
@@ -14,7 +14,7 @@ class GetIndicesEvent extends IndicesEvent {
 }
 
 class IndicesSocketEventReceived extends IndicesEvent {
-  final MarketSocketEvent socketEvent;
+  final LiveIndicesEvent socketEvent;
 
   const IndicesSocketEventReceived(this.socketEvent);
 

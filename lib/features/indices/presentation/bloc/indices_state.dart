@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../../core/services/market_socket_service.dart';
 import '../../domain/entities/index_entity.dart';
+import '../../domain/entities/live_indices_event.dart';
 
 abstract class IndicesState extends Equatable {
   const IndicesState();
@@ -20,12 +20,12 @@ class IndicesLoading extends IndicesState {
 
 class IndicesLoaded extends IndicesState {
   final List<IndexEntity> indices;
-  final MarketSocketStatus socketStatus;
+  final LiveIndicesConnectionStatus socketStatus;
   final String? errorMessage;
 
   const IndicesLoaded({
     required this.indices,
-    this.socketStatus = MarketSocketStatus.idle,
+    this.socketStatus = LiveIndicesConnectionStatus.idle,
     this.errorMessage,
   });
 
@@ -33,7 +33,7 @@ class IndicesLoaded extends IndicesState {
 
   IndicesLoaded copyWith({
     List<IndexEntity>? indices,
-    MarketSocketStatus? socketStatus,
+    LiveIndicesConnectionStatus? socketStatus,
     String? errorMessage,
     bool clearError = false,
   }) {

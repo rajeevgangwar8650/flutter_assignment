@@ -3,19 +3,20 @@ import 'package:dartz/dartz.dart';
 import '../../../../core/errors/error_handler.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../core/network/network_info.dart';
-import '../../../../core/services/market_socket_service.dart';
+import '../../domain/entities/live_indices_event.dart';
 import '../../domain/entities/index_entity.dart';
 import '../../domain/repositories/indices_repository.dart';
 import '../datasources/indices_local_datasource.dart';
+import '../datasources/indices_socket_datasource.dart';
 
 class IndicesRepositoryImpl implements IndicesRepository {
   final IndicesLocalDataSource localDataSource;
-  final MarketSocketService socketService;
+  final IndicesSocketDataSource socketDataSource;
   final NetworkInfo networkInfo;
 
   const IndicesRepositoryImpl({
     required this.localDataSource,
-    required this.socketService,
+    required this.socketDataSource,
     required this.networkInfo,
   });
 
@@ -29,8 +30,8 @@ class IndicesRepositoryImpl implements IndicesRepository {
   }
 
   @override
-  Stream<MarketSocketEvent> watchLiveIndices() {
-    return socketService.stream;
+  Stream<LiveIndicesEvent> watchLiveIndices() {
+    return socketDataSource.stream;
   }
 
   @override
@@ -42,7 +43,7 @@ class IndicesRepositoryImpl implements IndicesRepository {
           NetworkFailure('No internet connection. Please check your network.'),
         );
       }
-      await socketService.connect(symbols);
+      await socketDataSource.connect(symbols);
       return const Right(null);
     } catch (error) {
       return Left(ErrorHandler.toFailure(error));
@@ -52,7 +53,7 @@ class IndicesRepositoryImpl implements IndicesRepository {
   @override
   Future<Either<Failure, void>> disconnectLiveIndices() async {
     try {
-      await socketService.dispose();
+      await socketDataSource.dispose();
       return const Right(null);
     } catch (error) {
       return Left(ErrorHandler.toFailure(error));

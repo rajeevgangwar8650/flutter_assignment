@@ -2,9 +2,10 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../core/services/market_socket_service.dart';
 import '../../../../core/usecases/usecase.dart';
 import '../../domain/entities/index_entity.dart';
+import '../../domain/entities/live_index_tick.dart';
+import '../../domain/entities/live_indices_event.dart';
 import '../../domain/usecases/get_indices_usecase.dart';
 import 'indices_event.dart';
 import 'indices_state.dart';
@@ -17,7 +18,7 @@ class IndicesBloc extends Bloc<IndicesEvent, IndicesState> {
   final DisconnectLiveIndicesUseCase disconnectLiveIndicesUseCase;
   final WatchLiveIndicesUseCase watchLiveIndicesUseCase;
 
-  StreamSubscription<MarketSocketEvent>? _socketSubscription;
+  StreamSubscription<LiveIndicesEvent>? _socketSubscription;
 
   IndicesBloc({
     required this.getIndicesUseCase,
@@ -39,7 +40,7 @@ class IndicesBloc extends Bloc<IndicesEvent, IndicesState> {
     if (currentState is IndicesLoaded && currentState.hasData) {
       emit(
         currentState.copyWith(
-          socketStatus: MarketSocketStatus.reconnecting,
+          socketStatus: LiveIndicesConnectionStatus.reconnecting,
           clearError: true,
         ),
       );
@@ -79,7 +80,7 @@ class IndicesBloc extends Bloc<IndicesEvent, IndicesState> {
       if (currentState is IndicesLoaded) {
         emit(
           currentState.copyWith(
-            socketStatus: MarketSocketStatus.failed,
+            socketStatus: LiveIndicesConnectionStatus.failed,
             errorMessage: failure.message,
           ),
         );
@@ -100,7 +101,8 @@ class IndicesBloc extends Bloc<IndicesEvent, IndicesState> {
     final tick = socketEvent.tick;
 
     if (tick == null) {
-      final isFailure = socketEvent.status == MarketSocketStatus.failed;
+      final isFailure =
+          socketEvent.status == LiveIndicesConnectionStatus.failed;
       emit(
         currentState.copyWith(
           socketStatus: socketEvent.status,
@@ -125,7 +127,8 @@ class IndicesBloc extends Bloc<IndicesEvent, IndicesState> {
       emit(
         currentState.copyWith(
           socketStatus: socketEvent.status,
-          clearError: socketEvent.status == MarketSocketStatus.connected,
+          clearError:
+              socketEvent.status == LiveIndicesConnectionStatus.connected,
         ),
       );
       return;
@@ -134,13 +137,13 @@ class IndicesBloc extends Bloc<IndicesEvent, IndicesState> {
     emit(
       currentState.copyWith(
         indices: updatedIndices,
-        socketStatus: MarketSocketStatus.connected,
+        socketStatus: LiveIndicesConnectionStatus.connected,
         clearError: true,
       ),
     );
   }
 
-  IndexEntity _updatedIndex(IndexEntity current, MarketTick tick) {
+  IndexEntity _updatedIndex(IndexEntity current, LiveIndexTick tick) {
     final direction = tick.currentValue > current.currentValue
         ? IndexPriceDirection.up
         : tick.currentValue < current.currentValue
@@ -159,16 +162,16 @@ class IndicesBloc extends Bloc<IndicesEvent, IndicesState> {
     );
   }
 
-  double _changeForTick(MarketTick tick, double fallback) {
+  double _changeForTick(LiveIndexTick tick, double fallback) {
     return tick.close == 0 ? fallback : tick.currentValue - tick.close;
   }
 
-  bool _matchesIndex(IndexEntity index, MarketTick tick) {
-    final normalizedTickName = _normalizeToken(tick.name);
-    return normalizedTickName == _normalizeToken(index.token) ||
-        normalizedTickName == _normalizeToken(_tokenFromIdentifier(index.ss)) ||
-        normalizedTickName == _normalizeToken(index.ss) ||
-        _normalize(tick.name) == _normalize(index.symbol);
+  bool _matchesIndex(IndexEntity index, LiveIndexTick tick) {
+    final normalizedTickToken = _normalizeToken(tick.token);
+    return normalizedTickToken == _normalizeToken(index.token) ||
+        normalizedTickToken ==
+            _normalizeToken(_tokenFromIdentifier(index.ss)) ||
+        _normalize(tick.streamSymbol) == _normalize(index.ss);
   }
 
   String _tokenFromIdentifier(String value) {

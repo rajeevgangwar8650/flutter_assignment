@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_assignment/core/utils/extension.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../core/services/market_socket_service.dart';
+import '../../domain/entities/live_indices_event.dart';
 import '../bloc/indices_bloc.dart';
 import '../bloc/indices_event.dart';
 import '../bloc/indices_state.dart';
@@ -22,25 +22,27 @@ class ConnectionBannerWidget extends StatelessWidget {
         }
         if (state is IndicesError) {
           return _ConnectionViewData(
-            status: MarketSocketStatus.failed,
+            status: LiveIndicesConnectionStatus.failed,
             message: state.message,
           );
         }
         if (state is IndicesLoading) {
           return const _ConnectionViewData(
-            status: MarketSocketStatus.connecting,
+            status: LiveIndicesConnectionStatus.connecting,
           );
         }
-        return const _ConnectionViewData(status: MarketSocketStatus.idle);
+        return const _ConnectionViewData(
+          status: LiveIndicesConnectionStatus.idle,
+        );
       },
       builder: (context, data) {
         final colorScheme = Theme.of(context).colorScheme;
         final isProblem =
-            data.status == MarketSocketStatus.failed ||
-            data.status == MarketSocketStatus.disconnected;
+            data.status == LiveIndicesConnectionStatus.failed ||
+            data.status == LiveIndicesConnectionStatus.disconnected;
         final isConnecting =
-            data.status == MarketSocketStatus.connecting ||
-            data.status == MarketSocketStatus.reconnecting;
+            data.status == LiveIndicesConnectionStatus.connecting ||
+            data.status == LiveIndicesConnectionStatus.reconnecting;
         final color = isProblem
             ? colorScheme.error
             : isConnecting
@@ -84,19 +86,21 @@ class ConnectionBannerWidget extends StatelessWidget {
 
   String _labelFor(_ConnectionViewData data) {
     return switch (data.status) {
-      MarketSocketStatus.connected => 'Live updates connected',
-      MarketSocketStatus.connecting => 'Connecting to live updates...',
-      MarketSocketStatus.reconnecting => 'Reconnecting to live updates...',
-      MarketSocketStatus.disconnected =>
+      LiveIndicesConnectionStatus.connected => 'Live updates connected',
+      LiveIndicesConnectionStatus.connecting => 'Connecting to live updates...',
+      LiveIndicesConnectionStatus.reconnecting =>
+        'Reconnecting to live updates...',
+      LiveIndicesConnectionStatus.disconnected =>
         data.message ?? 'Live updates disconnected',
-      MarketSocketStatus.failed => data.message ?? 'Live updates unavailable',
-      MarketSocketStatus.idle => 'Preparing live updates...',
+      LiveIndicesConnectionStatus.failed =>
+        data.message ?? 'Live updates unavailable',
+      LiveIndicesConnectionStatus.idle => 'Preparing live updates...',
     };
   }
 }
 
 class _ConnectionViewData {
-  final MarketSocketStatus status;
+  final LiveIndicesConnectionStatus status;
   final String? message;
 
   const _ConnectionViewData({required this.status, this.message});

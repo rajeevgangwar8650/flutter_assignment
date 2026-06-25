@@ -2,9 +2,9 @@ import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 
 import '../../../../core/errors/failures.dart';
-import '../../../../core/services/market_socket_service.dart';
 import '../../../../core/usecases/usecase.dart';
 import '../entities/index_entity.dart';
+import '../entities/live_indices_event.dart';
 import '../repositories/indices_repository.dart';
 
 class GetIndicesUseCase implements UseCase<List<IndexEntity>, NoParams> {
@@ -45,7 +45,7 @@ class WatchLiveIndicesUseCase {
 
   const WatchLiveIndicesUseCase(this.repository);
 
-  Stream<MarketSocketEvent> call() {
+  Stream<LiveIndicesEvent> call() {
     return repository.watchLiveIndices();
   }
 }

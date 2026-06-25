@@ -6,7 +6,6 @@ import '../../core/network/dio_client.dart';
 import '../../core/network/dio_interceptor.dart';
 import '../../core/network/network_info.dart';
 import '../../core/services/logger_service.dart';
-import '../../core/services/market_socket_service.dart';
 import '../../core/services/shared_preferences_service.dart';
 import '../../features/auth/data/datasources/auth_local_datasource.dart';
 import '../../features/auth/data/datasources/auth_remote_datasource_impl.dart';
@@ -17,6 +16,7 @@ import '../../features/auth/domain/usecases/restore_session_usecase.dart';
 import '../../features/auth/domain/usecases/sign_in_usecase.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/indices/data/datasources/indices_local_datasource.dart';
+import '../../features/indices/data/datasources/indices_socket_datasource.dart';
 import '../../features/indices/data/repositories/indices_repository_impl.dart';
 import '../../features/indices/domain/repositories/indices_repository.dart';
 import '../../features/indices/domain/usecases/get_indices_usecase.dart';
@@ -106,13 +106,8 @@ Future<void> initDependencies() async {
     )
     // Indices
     ..registerFactory<IndicesLocalDataSource>(IndicesLocalDataSourceImpl.new)
-    ..registerFactory<IndicesRepository>(
-      () => IndicesRepositoryImpl(
-        localDataSource: injector(),
-        socketService: MarketSocketService(),
-        networkInfo: injector(),
-      ),
-    )
+    ..registerFactory<IndicesSocketDataSource>(IndicesSocketDataSourceImpl.new)
+    ..registerFactory<IndicesRepository>(_createIndicesRepository)
     ..registerFactory<GetIndicesUseCase>(() => GetIndicesUseCase(injector()))
     ..registerFactory<ConnectLiveIndicesUseCase>(
       () => ConnectLiveIndicesUseCase(injector()),
@@ -124,12 +119,7 @@ Future<void> initDependencies() async {
       () => WatchLiveIndicesUseCase(injector()),
     )
     ..registerFactory<IndicesBloc>(() {
-      final socketService = MarketSocketService();
-      final repository = IndicesRepositoryImpl(
-        localDataSource: IndicesLocalDataSourceImpl(),
-        socketService: socketService,
-        networkInfo: injector(),
-      );
+      final repository = _createIndicesRepository();
 
       return IndicesBloc(
         getIndicesUseCase: GetIndicesUseCase(repository),
@@ -151,4 +141,12 @@ Future<void> initDependencies() async {
 
       return StocksBloc(getStocksUseCase: GetStocksUseCase(repository));
     });
+}
+
+IndicesRepository _createIndicesRepository() {
+  return IndicesRepositoryImpl(
+    localDataSource: injector(),
+    socketDataSource: injector(),
+    networkInfo: injector(),
+  );
 }
