@@ -1,14 +1,8 @@
 import 'package:dartz/dartz.dart';
 
 import '../../../../core/errors/failures.dart';
-import '../entities/stocks_entity.dart';
+import '../entities/stock_entity.dart';
 
 abstract class StocksRepository {
-  Future<Either<Failure, StockDashboardEntity>> getStockDashboard();
-
-  Stream<StockSocketEventEntity> watchLiveIndices();
-
-  Future<Either<Failure, void>> connectLiveIndices(List<String> symbols);
-
-  Future<Either<Failure, void>> disconnectLiveIndices();
+  Future<Either<Failure, List<StockEntity>>> getStocks();
 }

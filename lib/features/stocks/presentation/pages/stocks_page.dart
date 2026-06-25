@@ -6,12 +6,13 @@ import '../../../../core/utils/snackbar_helper.dart';
 import '../../../../core/widgets/empty_widget.dart';
 import '../../../../core/widgets/error_widget.dart';
 import '../../../../core/widgets/loading_widget.dart';
-import '../../domain/entities/stocks_entity.dart';
+import '../../../indices/presentation/bloc/indices_bloc.dart';
+import '../../../indices/presentation/bloc/indices_event.dart';
+import '../../../indices/presentation/widgets/connection_banner_widget.dart';
+import '../../../indices/presentation/widgets/indices_widget.dart';
 import '../bloc/stocks_bloc.dart';
 import '../bloc/stocks_event.dart';
 import '../bloc/stocks_state.dart';
-import '../widgets/connection_banner_widget.dart';
-import '../widgets/indices_widget.dart';
 import '../widgets/market_header_widget.dart';
 import '../widgets/stocks_widget.dart';
 
@@ -38,10 +39,7 @@ class _StocksPageState extends State<StocksPage> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state != AppLifecycleState.resumed || !mounted) return;
-    final bloc = context.read<StocksBloc>();
-    if (bloc.state.hasData) {
-      bloc.add(const StocksRetryRequested());
-    }
+    context.read<IndicesBloc>().add(const GetIndicesEvent());
   }
 
   @override
@@ -58,41 +56,33 @@ class _StocksPageState extends State<StocksPage> with WidgetsBindingObserver {
         ],
       ),
       body: BlocConsumer<StocksBloc, StocksState>(
-        listenWhen: (previous, current) =>
-            previous.errorMessage != current.errorMessage &&
-            current.errorMessage != null &&
-            (current.status == StocksStatus.failure ||
-                current.socketStatus == StockSocketStatus.failed),
+        listenWhen: (previous, current) => current is StocksError,
         listener: (context, state) {
-          SnackbarHelper.showError(context, state.errorMessage!);
+          if (state is StocksError) {
+            SnackbarHelper.showError(context, state.message);
+          }
         },
-        buildWhen: (previous, current) =>
-            previous.status != current.status ||
-            previous.stocks != current.stocks ||
-            previous.hasData != current.hasData ||
-            previous.errorMessage != current.errorMessage,
         builder: (context, state) {
-          if (state.status == StocksStatus.loading && !state.hasData) {
+          if (state is StocksLoading) {
             return const LoadingWidget(message: 'Loading market data...');
           }
 
-          if (state.status == StocksStatus.failure && !state.hasData) {
+          if (state is StocksError) {
             return AppErrorWidget(
-              message: state.errorMessage ?? 'Unable to load market data.',
+              message: state.message,
               onRetry: () {
-                context.read<StocksBloc>().add(const StocksRetryRequested());
+                context.read<StocksBloc>().add(const GetStocksEvent());
               },
             );
           }
 
-          if (!state.hasData) {
+          if (state is! StocksLoaded || !state.hasData) {
             return const EmptyWidget(message: 'No market data available.');
           }
 
           return RefreshIndicator(
             onRefresh: () async {
-              context.read<StocksBloc>().add(const StocksRetryRequested());
-              await Future<void>.delayed(const Duration(milliseconds: 500));
+              context.read<IndicesBloc>().add(const GetIndicesEvent());
             },
             child: CustomScrollView(
               slivers: [

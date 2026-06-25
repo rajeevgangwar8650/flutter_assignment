@@ -1,23 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_assignment/core/utils/extension.dart';
-import 'package:flutter_assignment/features/stocks/presentation/widgets/stocks_widget.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../../core/utils/market_formatters.dart';
 import '../../../../core/widgets/empty_widget.dart';
-import '../../domain/entities/stocks_entity.dart';
-import '../bloc/stocks_bloc.dart';
-import '../bloc/stocks_state.dart';
+import '../../../../core/widgets/loading_widget.dart';
+import '../../domain/entities/index_entity.dart';
+import '../bloc/indices_bloc.dart';
+import '../bloc/indices_state.dart';
 
 class IndicesWidget extends StatelessWidget {
   const IndicesWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<StocksBloc, StocksState>(
-      buildWhen: (previous, current) =>
-          previous.indexOrder != current.indexOrder ||
-          previous.indicesBySymbol != current.indicesBySymbol,
+    return BlocBuilder<IndicesBloc, IndicesState>(
+      buildWhen: (previous, current) => previous != current,
       builder: (context, state) {
-        final indices = state.indices;
+        if (state is IndicesLoading) {
+          return const SizedBox(
+            height: 150,
+            child: LoadingWidget(message: 'Loading live indices...'),
+          );
+        }
+
+        if (state is IndicesError) {
+          return SizedBox(
+            height: 150,
+            child: EmptyWidget(message: state.message),
+          );
+        }
+
+        final indices = state is IndicesLoaded
+            ? state.indices
+            : const <IndexEntity>[];
         if (indices.isEmpty) {
           return const SizedBox(
             height: 150,
@@ -46,7 +62,7 @@ class IndicesWidget extends StatelessWidget {
 }
 
 class LiveIndexCard extends StatefulWidget {
-  final StockIndexEntity index;
+  final IndexEntity index;
 
   const LiveIndexCard({super.key, required this.index});
 
@@ -79,10 +95,10 @@ class _LiveIndexCardState extends State<LiveIndexCard> {
           index.symbol.textMedium(
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            fontWeight: FontWeight.w700
+            fontWeight: FontWeight.w700,
           ),
           const Spacer(),
-          formatNumber(index.currentValue).textExtraLarge(fontSize: 22),
+          formatMarketNumber(index.currentValue).textExtraLarge(fontSize: 22),
           const SizedBox(height: 6),
           Row(
             children: [
@@ -93,12 +109,14 @@ class _LiveIndexCardState extends State<LiveIndexCard> {
               ),
               const SizedBox(width: 4),
               Flexible(
-                child: '${formatSigned(index.change)} (${formatSigned(index.changePercent)}%)'.textRegular(
-                  maxLines: 1,
-                  color: changeColor,
-                  fontWeight: FontWeight.w700,
-                  overflow: TextOverflow.ellipsis,
-                ),
+                child:
+                    '${formatMarketSigned(index.change)} (${formatMarketSigned(index.changePercent)}%)'
+                        .textRegular(
+                          maxLines: 1,
+                          color: changeColor,
+                          fontWeight: FontWeight.w700,
+                          overflow: TextOverflow.ellipsis,
+                        ),
               ),
             ],
           ),

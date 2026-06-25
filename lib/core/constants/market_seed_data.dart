@@ -1,42 +1,6 @@
-import '../models/stocks_model.dart';
-import '../../domain/entities/stocks_entity.dart';
-import '../../../../core/services/stocks_socket_service.dart';
+// Generated from the assignment-provided static market JSON.
 
-abstract class StocksDataSource {
-  Future<StockDashboardModel> getStockDashboard();
-  Stream<StockSocketEventEntity> watchLiveIndices();
-  Future<void> connectLiveIndices(List<String> symbols);
-  Future<void> disconnectLiveIndices();
-}
-
-class StocksDataSourceImpl implements StocksDataSource {
-  final StocksSocketService socketService;
-
-  const StocksDataSourceImpl(this.socketService);
-
-  @override
-  Future<StockDashboardModel> getStockDashboard() async {
-    await Future<void>.delayed(const Duration(milliseconds: 300));
-    return StockDashboardModel.fromJson(_stockDashboardJson);
-  }
-
-  @override
-  Stream<StockSocketEventEntity> watchLiveIndices() {
-    return socketService.stream;
-  }
-
-  @override
-  Future<void> connectLiveIndices(List<String> symbols) {
-    return socketService.connect(symbols);
-  }
-
-  @override
-  Future<void> disconnectLiveIndices() {
-    return socketService.dispose();
-  }
-}
-
-const Map<String, dynamic> _stockDashboardJson = {
+const Map<String, dynamic> marketSeedData = {
   'declines': 16,
   'indices': [
     {

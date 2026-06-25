@@ -2,35 +2,35 @@ import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 
 import '../../../../core/errors/failures.dart';
+import '../../../../core/services/market_socket_service.dart';
 import '../../../../core/usecases/usecase.dart';
-import '../entities/stocks_entity.dart';
-import '../repositories/stocks_repository.dart';
+import '../entities/index_entity.dart';
+import '../repositories/indices_repository.dart';
 
-class GetStockDashboardUseCase implements UseCase<StockDashboardEntity, NoParams> {
-  final StocksRepository repository;
+class GetIndicesUseCase implements UseCase<List<IndexEntity>, NoParams> {
+  final IndicesRepository repository;
 
-  const GetStockDashboardUseCase(this.repository);
+  const GetIndicesUseCase(this.repository);
 
   @override
-  Future<Either<Failure, StockDashboardEntity>> call(NoParams params) {
-    return repository.getStockDashboard();
+  Future<Either<Failure, List<IndexEntity>>> call(NoParams params) {
+    return repository.getIndices();
   }
 }
 
-class ConnectLiveIndicesUseCase
-    implements UseCase<void, ConnectLiveIndicesParams> {
-  final StocksRepository repository;
+class ConnectLiveIndicesUseCase implements UseCase<void, LiveIndicesParams> {
+  final IndicesRepository repository;
 
   const ConnectLiveIndicesUseCase(this.repository);
 
   @override
-  Future<Either<Failure, void>> call(ConnectLiveIndicesParams params) {
+  Future<Either<Failure, void>> call(LiveIndicesParams params) {
     return repository.connectLiveIndices(params.symbols);
   }
 }
 
 class DisconnectLiveIndicesUseCase implements UseCase<void, NoParams> {
-  final StocksRepository repository;
+  final IndicesRepository repository;
 
   const DisconnectLiveIndicesUseCase(this.repository);
 
@@ -41,19 +41,19 @@ class DisconnectLiveIndicesUseCase implements UseCase<void, NoParams> {
 }
 
 class WatchLiveIndicesUseCase {
-  final StocksRepository repository;
+  final IndicesRepository repository;
 
   const WatchLiveIndicesUseCase(this.repository);
 
-  Stream<StockSocketEventEntity> call() {
+  Stream<MarketSocketEvent> call() {
     return repository.watchLiveIndices();
   }
 }
 
-class ConnectLiveIndicesParams extends Equatable {
+class LiveIndicesParams extends Equatable {
   final List<String> symbols;
 
-  const ConnectLiveIndicesParams(this.symbols);
+  const LiveIndicesParams(this.symbols);
 
   @override
   List<Object> get props => [symbols];

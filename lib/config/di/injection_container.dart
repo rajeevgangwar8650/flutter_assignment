@@ -6,6 +6,7 @@ import '../../core/network/dio_client.dart';
 import '../../core/network/dio_interceptor.dart';
 import '../../core/network/network_info.dart';
 import '../../core/services/logger_service.dart';
+import '../../core/services/market_socket_service.dart';
 import '../../core/services/shared_preferences_service.dart';
 import '../../features/auth/data/datasources/auth_local_datasource.dart';
 import '../../features/auth/data/datasources/auth_remote_datasource_impl.dart';
@@ -15,16 +16,20 @@ import '../../features/auth/domain/usecases/logout_usecase.dart';
 import '../../features/auth/domain/usecases/restore_session_usecase.dart';
 import '../../features/auth/domain/usecases/sign_in_usecase.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
+import '../../features/indices/data/datasources/indices_local_datasource.dart';
+import '../../features/indices/data/repositories/indices_repository_impl.dart';
+import '../../features/indices/domain/repositories/indices_repository.dart';
+import '../../features/indices/domain/usecases/get_indices_usecase.dart';
+import '../../features/indices/presentation/bloc/indices_bloc.dart';
 import '../../features/profile/data/data_sources/profile_data_source.dart';
 import '../../features/profile/data/repositories/profile_repository_imp.dart';
 import '../../features/profile/domain/repositories/profile_repository.dart';
 import '../../features/profile/domain/usecases/profile_usecase.dart';
 import '../../features/profile/presentation/bloc/profile_bloc.dart';
-import '../../features/stocks/data/data_sources/stocks_data_source.dart';
-import '../../core/services/stocks_socket_service.dart';
-import '../../features/stocks/data/repositories/stocks_repository_imp.dart';
+import '../../features/stocks/data/datasources/stocks_local_datasource.dart';
+import '../../features/stocks/data/repositories/stocks_repository_impl.dart';
 import '../../features/stocks/domain/repositories/stocks_repository.dart';
-import '../../features/stocks/domain/usecases/stocks_usecase.dart';
+import '../../features/stocks/domain/usecases/get_stocks_usecase.dart';
 import '../../features/stocks/presentation/bloc/stocks_bloc.dart';
 
 final GetIt injector = GetIt.instance;
@@ -99,15 +104,16 @@ Future<void> initDependencies() async {
         updateProfileUseCase: injector(),
       ),
     )
-    // Stocks
-    ..registerFactory<StocksSocketService>(StocksSocketService.new)
-    ..registerFactory<StocksDataSource>(() => StocksDataSourceImpl(injector()))
-    ..registerFactory<StocksRepository>(
-      () => StocksRepositoryImpl(injector(), injector()),
+    // Indices
+    ..registerFactory<IndicesLocalDataSource>(IndicesLocalDataSourceImpl.new)
+    ..registerFactory<IndicesRepository>(
+      () => IndicesRepositoryImpl(
+        localDataSource: injector(),
+        socketService: MarketSocketService(),
+        networkInfo: injector(),
+      ),
     )
-    ..registerFactory<GetStockDashboardUseCase>(
-      () => GetStockDashboardUseCase(injector()),
-    )
+    ..registerFactory<GetIndicesUseCase>(() => GetIndicesUseCase(injector()))
     ..registerFactory<ConnectLiveIndicesUseCase>(
       () => ConnectLiveIndicesUseCase(injector()),
     )
@@ -117,16 +123,32 @@ Future<void> initDependencies() async {
     ..registerFactory<WatchLiveIndicesUseCase>(
       () => WatchLiveIndicesUseCase(injector()),
     )
-    ..registerFactory<StocksBloc>(() {
-      final socketService = StocksSocketService();
-      final dataSource = StocksDataSourceImpl(socketService);
-      final repository = StocksRepositoryImpl(dataSource, injector());
+    ..registerFactory<IndicesBloc>(() {
+      final socketService = MarketSocketService();
+      final repository = IndicesRepositoryImpl(
+        localDataSource: IndicesLocalDataSourceImpl(),
+        socketService: socketService,
+        networkInfo: injector(),
+      );
 
-      return StocksBloc(
-        getStockDashboardUseCase: GetStockDashboardUseCase(repository),
+      return IndicesBloc(
+        getIndicesUseCase: GetIndicesUseCase(repository),
         connectLiveIndicesUseCase: ConnectLiveIndicesUseCase(repository),
         disconnectLiveIndicesUseCase: DisconnectLiveIndicesUseCase(repository),
         watchLiveIndicesUseCase: WatchLiveIndicesUseCase(repository),
       );
+    })
+    // Stocks
+    ..registerFactory<StocksLocalDataSource>(StocksLocalDataSourceImpl.new)
+    ..registerFactory<StocksRepository>(
+      () => StocksRepositoryImpl(localDataSource: injector()),
+    )
+    ..registerFactory<GetStocksUseCase>(() => GetStocksUseCase(injector()))
+    ..registerFactory<StocksBloc>(() {
+      final repository = StocksRepositoryImpl(
+        localDataSource: StocksLocalDataSourceImpl(),
+      );
+
+      return StocksBloc(getStocksUseCase: GetStocksUseCase(repository));
     });
 }

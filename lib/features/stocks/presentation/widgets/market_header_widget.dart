@@ -24,9 +24,13 @@ class MarketHeader extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  'Stock Watch'.textExtraLarge(color: colorScheme.onPrimaryContainer),
+                  'Stock Watch'.textExtraLarge(
+                    color: colorScheme.onPrimaryContainer,
+                  ),
                   const SizedBox(height: 6),
-                  '$stocks companies from the dataset'.textRegular(color: colorScheme.onPrimaryContainer),
+                  '$stocks companies from the dataset'.textRegular(
+                    color: colorScheme.onPrimaryContainer,
+                  ),
                 ],
               ),
             ),

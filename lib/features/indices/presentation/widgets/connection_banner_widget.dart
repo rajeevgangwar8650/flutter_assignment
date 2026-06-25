@@ -1,29 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_assignment/core/utils/extension.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../domain/entities/stocks_entity.dart';
-import '../bloc/stocks_bloc.dart';
-import '../bloc/stocks_event.dart';
-import '../bloc/stocks_state.dart';
+
+import '../../../../core/services/market_socket_service.dart';
+import '../bloc/indices_bloc.dart';
+import '../bloc/indices_event.dart';
+import '../bloc/indices_state.dart';
 
 class ConnectionBannerWidget extends StatelessWidget {
   const ConnectionBannerWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<StocksBloc, StocksState, _ConnectionViewData>(
-      selector: (state) => _ConnectionViewData(
-        status: state.socketStatus,
-        message: state.errorMessage,
-      ),
+    return BlocSelector<IndicesBloc, IndicesState, _ConnectionViewData>(
+      selector: (state) {
+        if (state is IndicesLoaded) {
+          return _ConnectionViewData(
+            status: state.socketStatus,
+            message: state.errorMessage,
+          );
+        }
+        if (state is IndicesError) {
+          return _ConnectionViewData(
+            status: MarketSocketStatus.failed,
+            message: state.message,
+          );
+        }
+        if (state is IndicesLoading) {
+          return const _ConnectionViewData(
+            status: MarketSocketStatus.connecting,
+          );
+        }
+        return const _ConnectionViewData(status: MarketSocketStatus.idle);
+      },
       builder: (context, data) {
         final colorScheme = Theme.of(context).colorScheme;
         final isProblem =
-            data.status == StockSocketStatus.failed ||
-                data.status == StockSocketStatus.disconnected;
+            data.status == MarketSocketStatus.failed ||
+            data.status == MarketSocketStatus.disconnected;
         final isConnecting =
-            data.status == StockSocketStatus.connecting ||
-                data.status == StockSocketStatus.reconnecting;
+            data.status == MarketSocketStatus.connecting ||
+            data.status == MarketSocketStatus.reconnecting;
         final color = isProblem
             ? colorScheme.error
             : isConnecting
@@ -50,15 +67,11 @@ class ConnectionBannerWidget extends StatelessWidget {
                 size: 20,
               ),
               const SizedBox(width: 10),
-              Expanded(
-                child: _labelFor(data).textMedium(color: color),
-              ),
+              Expanded(child: _labelFor(data).textMedium(color: color)),
               if (isProblem)
                 TextButton(
                   onPressed: () {
-                    context.read<StocksBloc>().add(
-                      const StocksRetryRequested(),
-                    );
+                    context.read<IndicesBloc>().add(const GetIndicesEvent());
                   },
                   child: 'Retry'.textMedium(),
                 ),
@@ -71,19 +84,19 @@ class ConnectionBannerWidget extends StatelessWidget {
 
   String _labelFor(_ConnectionViewData data) {
     return switch (data.status) {
-      StockSocketStatus.connected => 'Live updates connected',
-      StockSocketStatus.connecting => 'Connecting to live updates...',
-      StockSocketStatus.reconnecting => 'Reconnecting to live updates...',
-      StockSocketStatus.disconnected =>
-      data.message ?? 'Live updates disconnected',
-      StockSocketStatus.failed => data.message ?? 'Live updates unavailable',
-      StockSocketStatus.idle => 'Preparing live updates...',
+      MarketSocketStatus.connected => 'Live updates connected',
+      MarketSocketStatus.connecting => 'Connecting to live updates...',
+      MarketSocketStatus.reconnecting => 'Reconnecting to live updates...',
+      MarketSocketStatus.disconnected =>
+        data.message ?? 'Live updates disconnected',
+      MarketSocketStatus.failed => data.message ?? 'Live updates unavailable',
+      MarketSocketStatus.idle => 'Preparing live updates...',
     };
   }
 }
 
 class _ConnectionViewData {
-  final StockSocketStatus status;
+  final MarketSocketStatus status;
   final String? message;
 
   const _ConnectionViewData({required this.status, this.message});

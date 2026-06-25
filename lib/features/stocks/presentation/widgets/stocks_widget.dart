@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_assignment/core/utils/extension.dart';
 import '../../../../core/widgets/empty_widget.dart';
-import '../../domain/entities/stocks_entity.dart';
+import '../../../../core/utils/market_formatters.dart';
+import '../../domain/entities/stock_entity.dart';
 
 class StocksWidget extends StatelessWidget {
-  final List<StockItemEntity> stocks;
+  final List<StockEntity> stocks;
 
   const StocksWidget({super.key, required this.stocks});
 
@@ -32,7 +33,7 @@ class StocksWidget extends StatelessWidget {
 }
 
 class StockListCard extends StatelessWidget {
-  final StockItemEntity stock;
+  final StockEntity stock;
 
   const StockListCard({super.key, required this.stock});
 
@@ -70,14 +71,15 @@ class StockListCard extends StatelessWidget {
             Row(
               children: [
                 Expanded(
-                  child: _formatCurrency(stock.currentPrice).textExtraLarge(
-                    fontSize: 20
-                  ),
+                  child: _formatCurrency(
+                    stock.currentPrice,
+                  ).textExtraLarge(fontSize: 20),
                 ),
-                '${formatSigned(stock.priceChange)} (${formatSigned(stock.percentageChange)}%)'.textRegular(
-                  color: changeColor,
-                  fontWeight: FontWeight.w700,
-                ),
+                '${formatMarketSigned(stock.priceChange)} (${formatMarketSigned(stock.percentageChange)}%)'
+                    .textRegular(
+                      color: changeColor,
+                      fontWeight: FontWeight.w700,
+                    ),
               ],
             ),
             const Spacer(),
@@ -92,9 +94,11 @@ class StockListCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 6),
                 Expanded(
-                  child: (stock.hasHoldings ? 'Holdings: ${stock.holdings}' : 'No holdings').textSmall(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
+                  child:
+                      (stock.hasHoldings
+                              ? 'Holdings: ${stock.holdings}'
+                              : 'No holdings')
+                          .textSmall(color: colorScheme.onSurfaceVariant),
                 ),
                 stock.type.textSmall(
                   color: colorScheme.onSurfaceVariant,
@@ -132,11 +136,4 @@ class _Pill extends StatelessWidget {
   }
 }
 
-String _formatCurrency(double value) => 'Rs ${formatNumber(value)}';
-
-String formatNumber(double value) => value.toStringAsFixed(2);
-
-String formatSigned(double value) {
-  final prefix = value > 0 ? '+' : '';
-  return '$prefix${value.toStringAsFixed(2)}';
-}
+String _formatCurrency(double value) => 'Rs ${formatMarketNumber(value)}';
