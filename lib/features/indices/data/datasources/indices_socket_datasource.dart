@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:web_socket_channel/web_socket_channel.dart';
-
 import '../../../../core/constants/api_constants.dart';
 import '../../domain/entities/live_indices_event.dart';
 import '../models/live_index_tick_model.dart';
@@ -20,7 +18,6 @@ abstract class IndicesSocketDataSource {
 class IndicesSocketDataSourceImpl implements IndicesSocketDataSource {
   static final Uri _socketUri = Uri.parse(ApiConstants.socketUrl);
   static const Duration _connectTimeout = Duration(seconds: 12);
-  static const Duration _heartbeatInterval = Duration(seconds: 25);
   static const int _maxReconnectAttempts = 5;
 
   final StreamController<LiveIndicesEvent> _controller =
@@ -28,7 +25,6 @@ class IndicesSocketDataSourceImpl implements IndicesSocketDataSource {
 
   WebSocketChannel? _channel;
   StreamSubscription<dynamic>? _subscription;
-  Timer? _heartbeatTimer;
   Timer? _reconnectTimer;
   List<String> _symbols = const [];
   int _reconnectAttempts = 0;
@@ -65,7 +61,6 @@ class IndicesSocketDataSourceImpl implements IndicesSocketDataSource {
   @override
   Future<void> disconnect() async {
     _manualDisconnect = true;
-    _heartbeatTimer?.cancel();
     _reconnectTimer?.cancel();
     await _closeSocket();
   }
@@ -80,7 +75,6 @@ class IndicesSocketDataSourceImpl implements IndicesSocketDataSource {
   }
 
   Future<void> _openSocket({required bool isReconnect}) async {
-    _heartbeatTimer?.cancel();
     await _closeSocket();
     _emit(
       LiveIndicesEvent(
@@ -99,7 +93,6 @@ class IndicesSocketDataSourceImpl implements IndicesSocketDataSource {
         const LiveIndicesEvent(status: LiveIndicesConnectionStatus.connected),
       );
       _subscribe();
-      _startHeartbeat();
     } catch (error) {
       await _closeSocket();
       _emit(
@@ -172,7 +165,6 @@ class IndicesSocketDataSourceImpl implements IndicesSocketDataSource {
 
   String? _decodeMessage(dynamic message) {
     if (message is String) return message.trim();
-
     if (message is List<int>) {
       try {
         return utf8.decode(message).trim();
@@ -180,7 +172,6 @@ class IndicesSocketDataSourceImpl implements IndicesSocketDataSource {
         return null;
       }
     }
-
     return null;
   }
 
@@ -188,12 +179,6 @@ class IndicesSocketDataSourceImpl implements IndicesSocketDataSource {
     return payload.startsWith('{') || payload.startsWith('[');
   }
 
-  void _startHeartbeat() {
-    _heartbeatTimer?.cancel();
-    _heartbeatTimer = Timer.periodic(_heartbeatInterval, (_) {
-      _send(<String, dynamic>{'action': 'heartbeat'});
-    });
-  }
 
   void _send(Map<String, dynamic> payload) {
     try {
@@ -211,8 +196,6 @@ class IndicesSocketDataSourceImpl implements IndicesSocketDataSource {
 
   void _scheduleReconnect() {
     if (_manualDisconnect || _isDisposed) return;
-
-    _heartbeatTimer?.cancel();
     _reconnectTimer?.cancel();
 
     if (_reconnectAttempts >= _maxReconnectAttempts) {
@@ -250,7 +233,6 @@ class IndicesSocketDataSourceImpl implements IndicesSocketDataSource {
     try {
       await channel.sink.close().timeout(const Duration(seconds: 2));
     } catch (_) {
-      // Socket close failures are non-actionable during cleanup.
     }
   }
 
